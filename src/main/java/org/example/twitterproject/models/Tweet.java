@@ -11,9 +11,9 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Tweet {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
