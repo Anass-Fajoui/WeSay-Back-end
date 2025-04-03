@@ -4,6 +4,7 @@ import org.example.twitterproject.models.Tweet;
 import org.example.twitterproject.models.TweetDTO;
 import org.example.twitterproject.repositories.TweetRepo;
 import org.example.twitterproject.services.TweetService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,9 +12,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@CrossOrigin
 @RequestMapping("/api")
 public class Controller {
 
+    @Autowired
     private TweetService tweetService;
 
     @GetMapping("/tweets")
@@ -57,6 +60,25 @@ public class Controller {
             tweetService.deleteTweet(id);
             return ResponseEntity.status(HttpStatus.OK).body("Tweet Deleted Successfully");
         } catch (RuntimeException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    @PatchMapping("/tweet/{id}/like")
+    public ResponseEntity likeTweet(@PathVariable int id){
+        try {
+            tweetService.like(id);
+            return ResponseEntity.status(HttpStatus.OK).body("Tweet Liked successfully");
+        }catch(RuntimeException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+    @PatchMapping("/tweet/{id}/unlike")
+    public ResponseEntity unlikeTweet(@PathVariable int id){
+        try {
+            tweetService.unlike(id);
+            return ResponseEntity.status(HttpStatus.OK).body("Tweet Liked successfully");
+        }catch(RuntimeException e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }

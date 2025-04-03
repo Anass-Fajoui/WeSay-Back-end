@@ -4,11 +4,15 @@ import org.example.twitterproject.Exceptions.EntityNotFoundException;
 import org.example.twitterproject.models.Tweet;
 import org.example.twitterproject.models.TweetDTO;
 import org.example.twitterproject.repositories.TweetRepo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class TweetService {
 
+    @Autowired
     private TweetRepo tweetRepo;
 
     public List<Tweet> getTweets(){
@@ -25,15 +29,10 @@ public class TweetService {
     }
 
     public void addTweet(TweetDTO tweetD) {
-//        Tweet tweet = Tweet.builder()
-//                .title(tweetD.getTitle())
-//                .content(tweetD.getContent())
-//                .likes(0)
-//                .build();
+
         Tweet tweet = new Tweet();
         tweet.setTitle(tweetD.getTitle());
         tweet.setContent(tweetD.getContent());
-        tweet.setLikes(0);
 
         tweetRepo.save(tweet);
     }
@@ -54,5 +53,22 @@ public class TweetService {
             throw new EntityNotFoundException("Tweet Not Found");
         }
         tweetRepo.deleteById(id);
+    }
+
+    public void like(int id) {
+        Tweet currentTweet = tweetRepo.findById(id).orElse(null);
+        if (currentTweet == null){
+            throw new EntityNotFoundException("Tweet Not Found");
+        }
+        currentTweet.like();
+        tweetRepo.save(currentTweet);
+    }
+    public void unlike(int id) {
+        Tweet currentTweet = tweetRepo.findById(id).orElse(null);
+        if (currentTweet == null){
+            throw new EntityNotFoundException("Tweet Not Found");
+        }
+        currentTweet.unlike();
+        tweetRepo.save(currentTweet);
     }
 }
