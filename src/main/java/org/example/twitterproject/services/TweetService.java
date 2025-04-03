@@ -25,11 +25,15 @@ public class TweetService {
     }
 
     public void addTweet(TweetDTO tweetD) {
-        Tweet tweet = Tweet.builder()
-                .title(tweetD.getTitle())
-                .content(tweetD.getContent())
-                .likes(0)
-                .build();
+//        Tweet tweet = Tweet.builder()
+//                .title(tweetD.getTitle())
+//                .content(tweetD.getContent())
+//                .likes(0)
+//                .build();
+        Tweet tweet = new Tweet();
+        tweet.setTitle(tweetD.getTitle());
+        tweet.setContent(tweetD.getContent());
+        tweet.setLikes(0);
 
         tweetRepo.save(tweet);
     }
