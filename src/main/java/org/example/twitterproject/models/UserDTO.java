@@ -6,8 +6,7 @@ import lombok.*;
 //@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
+@Data
 public class UserDTO {
     private String firstName;
 
