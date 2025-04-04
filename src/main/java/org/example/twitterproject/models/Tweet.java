@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-public class Tweet {
+public class Tweet implements Comparable<Tweet>{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -96,5 +96,8 @@ public class Tweet {
                 ", content='" + content + '\'' +
                 ", likes=" + likes +
                 '}';
+    }
+    public int compareTo(Tweet tweet){
+        return tweet.createdAt.compareTo(this.createdAt);
     }
 }
