@@ -7,6 +7,7 @@ import org.example.twitterproject.repositories.TweetRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -33,6 +34,8 @@ public class TweetService {
         Tweet tweet = new Tweet();
         tweet.setTitle(tweetD.getTitle());
         tweet.setContent(tweetD.getContent());
+        tweet.setCreatedAt(LocalDateTime.now());
+        tweet.setLastModifiedAt(LocalDateTime.now());
 
         tweetRepo.save(tweet);
     }
@@ -44,6 +47,7 @@ public class TweetService {
         }
         currentTweet.setTitle(tweetd.getTitle());
         currentTweet.setContent(tweetd.getContent());
+        currentTweet.setLastModifiedAt(LocalDateTime.now());
         tweetRepo.save(currentTweet);
     }
 

@@ -9,6 +9,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 public class Tweet {
     @Id
@@ -18,6 +20,10 @@ public class Tweet {
     private String title;
 
     private String content;
+
+    private LocalDateTime createdAt;
+
+    private LocalDateTime lastModifiedAt;
 
     private Integer likes = 0;
 
@@ -44,6 +50,22 @@ public class Tweet {
 
     public Integer getLikes() {
         return likes;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getLastModifiedAt() {
+        return lastModifiedAt;
+    }
+
+    public void setLastModifiedAt(LocalDateTime lastModifiedAt) {
+        this.lastModifiedAt = lastModifiedAt;
     }
 
     public void setId(Integer id) {

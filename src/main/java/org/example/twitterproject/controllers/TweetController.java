@@ -2,7 +2,6 @@ package org.example.twitterproject.controllers;
 
 import org.example.twitterproject.models.Tweet;
 import org.example.twitterproject.models.TweetDTO;
-import org.example.twitterproject.repositories.TweetRepo;
 import org.example.twitterproject.services.TweetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,7 +13,7 @@ import java.util.List;
 @RestController
 @CrossOrigin
 @RequestMapping("/api")
-public class Controller {
+public class TweetController {
 
     @Autowired
     private TweetService tweetService;
@@ -28,7 +27,7 @@ public class Controller {
     public ResponseEntity getTweet(@PathVariable int id){
         try{
             Tweet tweet = tweetService.getTweet(id);
-            return ResponseEntity.status(HttpStatus.FOUND).body(tweet);
+            return ResponseEntity.status(HttpStatus.OK).body(tweet);
         } catch (RuntimeException e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Resource Not Found");
         }
