@@ -6,7 +6,9 @@ import org.example.twitterproject.models.Role;
 import org.example.twitterproject.models.User;
 import org.example.twitterproject.repositories.UserRepo;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -29,9 +31,14 @@ public class AuthenticationService {
                 .lastName(request.getLastName())
                 .userName(request.getUserName())
                 .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassowrd()))
+                .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.USER)
                 .build();
+
+        if (repo.existsByEmail(request.getEmail())) {
+            throw new IllegalArgumentException("Email already in use");
+        }
+
         repo.save(user);
 
         var jwtToken = jwtService.generateToken(user);
@@ -41,13 +48,17 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request){
-        authManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getPassowrd()
-                )
-        );
-        var user = repo.findByEmail(request.getEmail()).orElseThrow();
+        try {
+            authManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getEmail(),
+                            request.getPassword()
+                    )
+            );
+        } catch (BadCredentialsException e) {
+            throw new RuntimeException("Email or Password are invalid");
+        }
+        var user = repo.findByEmail(request.getEmail()).orElseThrow(() -> new UsernameNotFoundException("User not found"));
         var jwtToken = jwtService.generateToken(user);
         return AuthenticationResponse.builder()
                 .token(jwtToken)
