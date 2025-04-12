@@ -25,60 +25,64 @@ public class TweetController {
 
     @GetMapping("/tweet/{id}")
     public ResponseEntity getTweet(@PathVariable int id){
-        try{
-            Tweet tweet = tweetService.getTweet(id);
-            return ResponseEntity.status(HttpStatus.OK).body(tweet);
-        } catch (RuntimeException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Resource Not Found");
-        }
+
+        Tweet tweet = tweetService.getTweet(id);
+        return ResponseEntity.status(HttpStatus.OK).body(tweet);
+
+    }
+    @GetMapping("/id/tweets")
+    public List <Tweet> getTweetsByUser(@PathVariable int id){
+        List<Tweet> tweets = tweetService.getTweetsByUser(id);
+        return tweets;
     }
 
     @PostMapping("/tweets/add")
-    public ResponseEntity addTweet(@RequestBody TweetDTO tweetd){
-        try{
-            tweetService.addTweet(tweetd);
-            return ResponseEntity.status(HttpStatus.CREATED).body("Tweet Created");
-        }catch (RuntimeException e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+    public ResponseEntity addTweet(@RequestBody TweetDTO tweetd,
+                                   @RequestHeader("Authorization") String Token){
+
+        String token = Token.substring(7);
+        tweetService.addTweet(tweetd, token);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Tweet Created");
+
     }
 
     @PutMapping("/tweet/{id}")
-    public ResponseEntity updateTweet(@RequestBody TweetDTO tweetd, @PathVariable int id){
-        try{
-            tweetService.updateTweet(tweetd, id);
-            return ResponseEntity.status(HttpStatus.OK).body("Tweet Updated Successfully");
-        } catch (RuntimeException e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+    public ResponseEntity updateTweet(@RequestBody TweetDTO tweetd,
+                                      @PathVariable int id ,
+                                      @RequestHeader("Authorization") String Token){
+
+        String token = Token.substring(7);
+        tweetService.updateTweet(tweetd, id, token);
+        return ResponseEntity.status(HttpStatus.OK).body("Tweet Updated Successfully");
+
     }
 
     @DeleteMapping("/tweet/{id}")
-    public ResponseEntity deleteTweet(@PathVariable int id){
-        try{
-            tweetService.deleteTweet(id);
-            return ResponseEntity.status(HttpStatus.OK).body("Tweet Deleted Successfully");
-        } catch (RuntimeException e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+    public ResponseEntity deleteTweet(@PathVariable int id,
+                                      @RequestHeader("Authorization") String Token){
+
+        String token = Token.substring(7);
+        tweetService.deleteTweet(id, token);
+        return ResponseEntity.status(HttpStatus.OK).body("Tweet Deleted Successfully");
+
     }
 
     @PatchMapping("/tweet/{id}/like")
-    public ResponseEntity likeTweet(@PathVariable int id){
-        try {
-            tweetService.like(id);
-            return ResponseEntity.status(HttpStatus.OK).body("Tweet Liked successfully");
-        }catch(RuntimeException e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+    public ResponseEntity likeTweet(@PathVariable int id,
+                                    @RequestHeader("Authorization") String Token){
+
+        String token = Token.substring(7);
+        tweetService.like(id, token);
+        return ResponseEntity.status(HttpStatus.OK).body("Tweet Liked successfully");
+
     }
     @PatchMapping("/tweet/{id}/unlike")
-    public ResponseEntity unlikeTweet(@PathVariable int id){
-        try {
-            tweetService.unlike(id);
-            return ResponseEntity.status(HttpStatus.OK).body("Tweet Liked successfully");
-        }catch(RuntimeException e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+    public ResponseEntity unlikeTweet(@PathVariable int id,
+                                      @RequestHeader("Authorization") String Token){
+
+        String token = Token.substring(7);
+        tweetService.unlike(id, token);
+        return ResponseEntity.status(HttpStatus.OK).body("Tweet Liked successfully");
+
     }
 }

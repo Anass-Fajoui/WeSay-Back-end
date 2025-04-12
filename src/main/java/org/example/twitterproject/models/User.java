@@ -1,5 +1,6 @@
 package org.example.twitterproject.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,6 +10,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -37,6 +40,38 @@ public class User implements UserDetails {
     private String password;
 
     private Role role;
+
+    @OneToMany(mappedBy = "writer")
+    @JsonIgnore
+    private List<Tweet> tweets = new ArrayList<>();
+
+    public void addTweet(Tweet tweet){
+        tweets.add(tweet);
+    }
+    public void updateTweet(Tweet updatedTweet) {
+        tweets.stream()
+                .filter(t -> t.getId().equals(updatedTweet.getId()))
+                .findFirst()
+                .ifPresent(t -> {
+                    t.setTitle(updatedTweet.getTitle());
+                    t.setContent(updatedTweet.getContent());
+                    t.setLastModifiedAt(LocalDateTime.now());
+                });
+    }
+    public void removeTweet(Tweet tweet){
+        tweets.remove(tweet);
+    }
+
+    @ManyToMany(mappedBy = "likers")
+    private List<Tweet> tweetsLiked = new ArrayList<>();
+
+    public void addLikedTweet(Tweet tweet){
+        tweetsLiked.add(tweet);
+    }
+
+    public void removeLikedTweet(Tweet tweet){
+        tweetsLiked.remove(tweet);
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
