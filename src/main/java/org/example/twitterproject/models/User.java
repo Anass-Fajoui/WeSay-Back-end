@@ -11,10 +11,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Entity
 @Builder
@@ -63,9 +60,8 @@ public class User implements UserDetails {
     }
 
     @ManyToMany(mappedBy = "likers")
+    @JsonIgnore
     private List<Tweet> tweetsLiked = new ArrayList<>();
-
-
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

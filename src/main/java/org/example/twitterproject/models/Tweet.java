@@ -8,7 +8,9 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Data
@@ -48,7 +50,13 @@ public class Tweet implements Comparable<Tweet>{
     }
 
     public void like(User user){
+        if (likers.contains(user)){
+            return;
+        }
         likers.add(user);
+        if (user.getTweetsLiked().contains(this)){
+            return;
+        }
         user.getTweetsLiked().add(this);
         this.likes++;
     }

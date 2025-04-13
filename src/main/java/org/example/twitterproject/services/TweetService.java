@@ -14,8 +14,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class TweetService {
@@ -101,7 +103,7 @@ public class TweetService {
         tweetRepo.deleteById(id);
     }
 
-    public void like(int id, String token) {
+    public int like(int id, String token) {
         String username = jwtService.extractUsername(token);
         User user = userRepo.findByEmail(username)
                 .orElseThrow(() -> new EntityNotFoundException("User '"+username+"' not found"));
@@ -111,9 +113,11 @@ public class TweetService {
 
         currentTweet.like(user);
         tweetRepo.save(currentTweet);
+        userRepo.save(user);
+        return currentTweet.getLikes();
     }
 
-    public void unlike(int id, String token) {
+    public int unlike(int id, String token) {
         String username = jwtService.extractUsername(token);
         User user = userRepo.findByEmail(username)
                 .orElseThrow(() -> new EntityNotFoundException("User '"+username+"' not found"));
@@ -123,7 +127,7 @@ public class TweetService {
 
         currentTweet.unlike(user);
         tweetRepo.save(currentTweet);
+        userRepo.save(user);
+        return currentTweet.getLikes();
     }
-
-
 }

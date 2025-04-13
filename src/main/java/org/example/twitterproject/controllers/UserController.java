@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api")
@@ -29,25 +30,30 @@ public class UserController {
         return userService.getUser(id);
     }
 
-    @GetMapping("/userInfo/{id}")
-    public User getUser(@PathVariable int id,
-                        @RequestHeader("Authorization") String Token){
-        return userService.getUserInfo(id, Token);
+    @GetMapping("/myuser")
+    public User getMyUser(@RequestHeader("Authorization") String Token){
+        String token = Token.substring(7);
+        return userService.getMyUser(token);
     }
 
-    @PutMapping("/user/{id}")
-    public ResponseEntity editUser(@RequestBody UserDTO user, @PathVariable int id,
+    @GetMapping("/tweetsliked")
+    public List<Integer> getMyTweetsLiked(@RequestHeader("Authorization") String Token){
+        String token = Token.substring(7);
+        return userService.getMyTweetsLiked(token);
+    }
+
+    @PutMapping("/myuser")
+    public ResponseEntity editMyUser(@RequestBody UserDTO user,
                                    @RequestHeader("Authorization") String Token){
         String token = Token.substring(7);
-        userService.updateUser(user, id, Token);
+        userService.updateMyUser(user, token);
         return ResponseEntity.status(HttpStatus.OK).body("User Edited Successfully");
     }
 
-    @DeleteMapping("/user/{id}")
-    public ResponseEntity deleteUser(@PathVariable int id,
-                           @RequestHeader("Authorization") String Token){
+    @DeleteMapping("/myuser")
+    public ResponseEntity deleteMyUser(@RequestHeader("Authorization") String Token){
         String token = Token.substring(7);
-        userService.deleteUser(id, Token);
-        return ResponseEntity.status(HttpStatus.OK).body("User Created Successfully");
+        userService.deleteMyUser(token);
+        return ResponseEntity.status(HttpStatus.OK).body("User Deleted Successfully");
     }
 }

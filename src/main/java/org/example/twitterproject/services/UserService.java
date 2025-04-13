@@ -3,6 +3,7 @@ package org.example.twitterproject.services;
 import org.example.twitterproject.Exceptions.EntityNotFoundException;
 import org.example.twitterproject.config.JwtService;
 import org.example.twitterproject.models.DisplayUserDTO;
+import org.example.twitterproject.models.Tweet;
 import org.example.twitterproject.models.UserDTO;
 import org.example.twitterproject.models.User;
 import org.example.twitterproject.repositories.UserRepo;
@@ -12,7 +13,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,36 +42,19 @@ public class UserService {
         return dUser;
     }
 
-    public User getUserInfo(int id, String token){
+    public User getMyUser(String token){
         int tokenId = jwtService.extractId(token);
-
-        if (!userRepo.existsById(tokenId)){
-            throw new EntityNotFoundException("User "+tokenId+" in token not found");
-        }
-
-        User user = userRepo.findById(id)
-                .orElseThrow(() -> new UsernameNotFoundException("User "+ id + " Not Found"));
-
-        if (tokenId != id){
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to access this resource.");
-        }
+        User user = userRepo.findById(tokenId)
+                .orElseThrow(() -> new UsernameNotFoundException("User "+ tokenId + " Not Found"));
 
         return user;
     }
 
-    public void updateUser(UserDTO updateUser, int id, String token){
+    public void updateMyUser(UserDTO updateUser, String token){
         int tokenId = jwtService.extractId(token);
+        User user = userRepo.findById(tokenId)
+                .orElseThrow(() -> new UsernameNotFoundException("User "+ tokenId + " Not Found"));
 
-        if (!userRepo.existsById(tokenId)){
-            throw new EntityNotFoundException("User "+tokenId+" in token not found");
-        }
-
-        User user = userRepo.findById(id)
-                .orElseThrow(() -> new UsernameNotFoundException("User "+ id + " Not Found"));
-
-        if (tokenId != id){
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to access this resource.");
-        }
         user.setFirstName(updateUser.getFirstName());
         user.setLastName(updateUser.getLastName());
         user.setUserName(updateUser.getUserName());
@@ -78,20 +64,21 @@ public class UserService {
         userRepo.save(user);
     }
 
-    public void deleteUser(int id, String token){
+    public void deleteMyUser(String token){
         int tokenId = jwtService.extractId(token);
-        if (!userRepo.existsById(tokenId)){
-            throw new EntityNotFoundException("User "+tokenId+" in token not found");
-        }
 
-        if (!userRepo.existsById(id)){
-            throw new EntityNotFoundException("User "+id+" not found");
-        }
+        userRepo.deleteById(tokenId);
+    }
 
-        if (tokenId != id){
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to access this resource.");
-        }
+    public List<Integer> getMyTweetsLiked(String token) {
+        int tokenId = jwtService.extractId(token);
+        User user = userRepo.findById(tokenId)
+                .orElseThrow(() -> new UsernameNotFoundException("User "+ tokenId + " Not Found"));
 
-        userRepo.deleteById(id);
+        List<Tweet> likedTweets = user.getTweetsLiked();
+        List<Integer> likedTweetIds = likedTweets.stream()
+                .map(Tweet::getId)
+                .collect(Collectors.toList());
+        return likedTweetIds;
     }
 }

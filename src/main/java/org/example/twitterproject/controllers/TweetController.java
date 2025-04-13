@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @CrossOrigin
@@ -72,8 +73,8 @@ public class TweetController {
                                     @RequestHeader("Authorization") String Token){
 
         String token = Token.substring(7);
-        tweetService.like(id, token);
-        return ResponseEntity.status(HttpStatus.OK).body("Tweet Liked successfully");
+        int likes = tweetService.like(id, token);
+        return ResponseEntity.status(HttpStatus.OK).body(likes);
 
     }
     @PatchMapping("/tweet/{id}/unlike")
@@ -81,8 +82,8 @@ public class TweetController {
                                       @RequestHeader("Authorization") String Token){
 
         String token = Token.substring(7);
-        tweetService.unlike(id, token);
-        return ResponseEntity.status(HttpStatus.OK).body("Tweet Liked successfully");
+        int likes = tweetService.unlike(id, token);
+        return ResponseEntity.status(HttpStatus.OK).body(likes);
 
     }
 }
