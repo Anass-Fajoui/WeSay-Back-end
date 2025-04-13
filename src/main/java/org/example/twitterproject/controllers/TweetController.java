@@ -30,8 +30,8 @@ public class TweetController {
         return ResponseEntity.status(HttpStatus.OK).body(tweet);
 
     }
-    @GetMapping("/id/tweets")
-    public List <Tweet> getTweetsByUser(@PathVariable int id){
+    @GetMapping("user/{id}/tweets")
+    public List<Tweet> getTweetsByUser(@PathVariable int id){
         List<Tweet> tweets = tweetService.getTweetsByUser(id);
         return tweets;
     }

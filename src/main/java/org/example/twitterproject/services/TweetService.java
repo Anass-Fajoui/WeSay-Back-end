@@ -49,10 +49,10 @@ public class TweetService {
     }
 
     public void addTweet(TweetDTO tweetD, String token) {
-        String username = jwtService.extractUsername(token);
+        int tokenId = jwtService.extractId(token);
 
-        User writer = userRepo.findByEmail(username)
-                .orElseThrow(() -> new EntityNotFoundException("Writer not found"));
+        User writer = userRepo.findById(tokenId)
+                .orElseThrow(() -> new EntityNotFoundException("User "+tokenId+"in token not found"));
 
         Tweet tweet = new Tweet();
         tweet.setTitle(tweetD.getTitle());
@@ -61,19 +61,19 @@ public class TweetService {
         tweet.setLastModifiedAt(LocalDateTime.now());
         tweet.setWriter(writer);
 
-        writer.addTweet(tweet);
+//        writer.addTweet(tweet);
         tweetRepo.save(tweet);
     }
 
     public void updateTweet(TweetDTO tweetd, int id, String token) {
-        String username = jwtService.extractUsername(token);
-        User tokenUser = userRepo.findByEmail(username)
-                .orElseThrow(() -> new EntityNotFoundException("User '"+username+"' not found"));
-
+        int tokenId = jwtService.extractId(token);
+        if (!userRepo.existsById(tokenId)){
+            throw new EntityNotFoundException("User "+tokenId+" in token not found");
+        }
         Tweet currentTweet = tweetRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Tweet "+id+" Not Found"));
 
-        if (tokenUser.getId() != currentTweet.getWriter().getId()){
+        if (tokenId != currentTweet.getWriter().getId()){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to access this resource.");
         }
 
@@ -81,23 +81,23 @@ public class TweetService {
         currentTweet.setContent(tweetd.getContent());
         currentTweet.setLastModifiedAt(LocalDateTime.now());
 
-        tokenUser.updateTweet(currentTweet);
+//        tokenUser.updateTweet(currentTweet);
         tweetRepo.save(currentTweet);
     }
 
     public void deleteTweet(int id, String token) {
-        String username = jwtService.extractUsername(token);
-        User tokenUser = userRepo.findByEmail(username)
-                .orElseThrow(() -> new EntityNotFoundException("User '"+username+"' not found"));
-
+        int tokenId = jwtService.extractId(token);
+        if (!userRepo.existsById(tokenId)){
+            throw new EntityNotFoundException("User "+tokenId+" in token not found");
+        }
         Tweet currentTweet = tweetRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Tweet "+id+" Not Found"));
 
-        if (tokenUser.getId() != currentTweet.getWriter().getId()){
+        if (tokenId != currentTweet.getWriter().getId()){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to access this resource.");
         }
 
-        tokenUser.removeTweet(currentTweet);
+//        tokenUser.removeTweet(currentTweet);
         tweetRepo.deleteById(id);
     }
 
@@ -112,6 +112,7 @@ public class TweetService {
         currentTweet.like(user);
         tweetRepo.save(currentTweet);
     }
+
     public void unlike(int id, String token) {
         String username = jwtService.extractUsername(token);
         User user = userRepo.findByEmail(username)

@@ -1,8 +1,5 @@
 package org.example.twitterproject.models;
 
-import jakarta.persistence.Column;
-import lombok.*;
-
 
 public class UserDTO {
     private String firstName;

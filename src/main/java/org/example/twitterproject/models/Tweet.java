@@ -49,13 +49,13 @@ public class Tweet implements Comparable<Tweet>{
 
     public void like(User user){
         likers.add(user);
-        user.addLikedTweet(this);
+        user.getTweetsLiked().add(this);
         this.likes++;
     }
 
     public void unlike(User user){
         likers.remove(user);
-        user.removeLikedTweet(this);
+        user.getTweetsLiked().remove(this);
         this.likes--;
     }
 }

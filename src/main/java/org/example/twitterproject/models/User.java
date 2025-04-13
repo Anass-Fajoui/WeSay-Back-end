@@ -41,7 +41,7 @@ public class User implements UserDetails {
 
     private Role role;
 
-    @OneToMany(mappedBy = "writer")
+    @OneToMany(mappedBy = "writer", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Tweet> tweets = new ArrayList<>();
 
@@ -65,13 +65,7 @@ public class User implements UserDetails {
     @ManyToMany(mappedBy = "likers")
     private List<Tweet> tweetsLiked = new ArrayList<>();
 
-    public void addLikedTweet(Tweet tweet){
-        tweetsLiked.add(tweet);
-    }
 
-    public void removeLikedTweet(Tweet tweet){
-        tweetsLiked.remove(tweet);
-    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -80,6 +74,10 @@ public class User implements UserDetails {
 
     public String getPassword() {
         return password;
+    }
+
+    public String getUserName(){
+        return userName;
     }
 
     @Override
