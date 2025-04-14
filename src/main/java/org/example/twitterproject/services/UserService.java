@@ -1,5 +1,6 @@
 package org.example.twitterproject.services;
 
+import org.example.twitterproject.Exceptions.EmailOrUsernameInUseException;
 import org.example.twitterproject.Exceptions.EntityNotFoundException;
 import org.example.twitterproject.config.JwtService;
 import org.example.twitterproject.models.DisplayUserDTO;
@@ -45,7 +46,7 @@ public class UserService {
     public User getMyUser(String token){
         int tokenId = jwtService.extractId(token);
         User user = userRepo.findById(tokenId)
-                .orElseThrow(() -> new UsernameNotFoundException("User "+ tokenId + " Not Found"));
+                .orElseThrow(() -> new EntityNotFoundException("User "+ tokenId + " Not Found"));
 
         return user;
     }
@@ -53,7 +54,21 @@ public class UserService {
     public void updateMyUser(UserDTO updateUser, String token){
         int tokenId = jwtService.extractId(token);
         User user = userRepo.findById(tokenId)
-                .orElseThrow(() -> new UsernameNotFoundException("User "+ tokenId + " Not Found"));
+                .orElseThrow(() -> new EntityNotFoundException("User "+ tokenId + " Not Found"));
+
+        var error = new EmailOrUsernameInUseException();
+
+        if (userRepo.existsByEmail(updateUser.getEmail()) &&
+                !updateUser.getEmail().equals(user.getEmail())) {
+            error.setEmailError(true);
+        }
+        if (userRepo.existsByUserName(updateUser.getUserName())  &&
+                !updateUser.getUserName().equals(user.getUserName())){
+            error.setUsernameError(true);
+        }
+        if (error.isReadyToThrow()){
+            throw error;
+        }
 
         user.setFirstName(updateUser.getFirstName());
         user.setLastName(updateUser.getLastName());
@@ -66,7 +81,9 @@ public class UserService {
 
     public void deleteMyUser(String token){
         int tokenId = jwtService.extractId(token);
-
+        if (!userRepo.existsById(tokenId)){
+            throw new EntityNotFoundException("User "+ tokenId + " Not Found");
+        }
         userRepo.deleteById(tokenId);
     }
 
