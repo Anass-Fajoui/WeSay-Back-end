@@ -47,6 +47,7 @@ public class TweetService {
         User user = userRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User with id : "+id+" is not found"));
         List<Tweet> tweets = user.getTweets();
+        Collections.sort(tweets);
         return tweets;
     }
 

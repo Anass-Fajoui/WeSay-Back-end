@@ -66,4 +66,8 @@ public class Tweet implements Comparable<Tweet>{
         user.getTweetsLiked().remove(this);
         this.likes--;
     }
+    public void unlikeDelete(User user){
+        likers.remove(user);
+        this.likes--;
+    }
 }

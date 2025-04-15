@@ -1,5 +1,6 @@
 package org.example.twitterproject.services;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.twitterproject.Exceptions.EmailOrUsernameInUseException;
 import org.example.twitterproject.Exceptions.EntityNotFoundException;
@@ -8,6 +9,7 @@ import org.example.twitterproject.models.DisplayUserDTO;
 import org.example.twitterproject.models.Tweet;
 import org.example.twitterproject.models.UserDTO;
 import org.example.twitterproject.models.User;
+import org.example.twitterproject.repositories.TweetRepo;
 import org.example.twitterproject.repositories.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,14 +27,16 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserService {
 
-    @Autowired
+
     private final UserRepo userRepo;
 
-    @Autowired
+
     private final JwtService jwtService;
 
-    @Autowired
+
     private final PasswordEncoder passwordEncoder;
+
+    private final TweetRepo tweetRepo;
 
     public List<DisplayUserDTO> getUsers() {
         List<User> users = userRepo.findAll();
@@ -86,12 +90,18 @@ public class UserService {
         userRepo.save(user);
     }
 
+    @Transactional
     public void deleteMyUser(String token){
         int tokenId = jwtService.extractId(token);
-        if (!userRepo.existsById(tokenId)){
-            throw new EntityNotFoundException("User "+ tokenId + " Not Found");
+        User user = userRepo.findById(tokenId)
+                .orElseThrow(() -> new EntityNotFoundException("User "+ tokenId + " Not Found"));
+
+        for (Tweet likedTweet : user.getTweetsLiked()){
+            likedTweet.unlikeDelete(user);
         }
-        userRepo.deleteById(tokenId);
+        user.getTweetsLiked().clear();
+        user.getTweets().clear();
+        userRepo.delete(user);
     }
 
     public List<Integer> getMyTweetsLiked(String token) {
@@ -104,5 +114,9 @@ public class UserService {
                 .map(Tweet::getId)
                 .collect(Collectors.toList());
         return likedTweetIds;
+    }
+
+    public List<User> getUsersBySearch(String query) {
+        return userRepo.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCaseOrUserNameContainingIgnoreCase(query, query, query);
     }
 }

@@ -3,6 +3,7 @@ package org.example.twitterproject.controllers;
 import org.example.twitterproject.models.DisplayUserDTO;
 import org.example.twitterproject.models.User;
 import org.example.twitterproject.models.UserDTO;
+import org.example.twitterproject.repositories.UserRepo;
 import org.example.twitterproject.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,8 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private UserRepo userRepo;
 
     @GetMapping("/users")
     public List<DisplayUserDTO> getUsers(){
@@ -34,6 +37,11 @@ public class UserController {
     public User getMyUser(@RequestHeader("Authorization") String Token){
         String token = Token.substring(7);
         return userService.getMyUser(token);
+    }
+
+    @GetMapping("/user/search")
+    public List<User> getUsersBySearch(@RequestParam String query){
+        return userService.getUsersBySearch(query);
     }
 
     @GetMapping("/tweetsliked")
