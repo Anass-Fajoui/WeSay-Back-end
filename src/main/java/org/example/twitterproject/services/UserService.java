@@ -1,5 +1,6 @@
 package org.example.twitterproject.services;
 
+import lombok.RequiredArgsConstructor;
 import org.example.twitterproject.Exceptions.EmailOrUsernameInUseException;
 import org.example.twitterproject.Exceptions.EntityNotFoundException;
 import org.example.twitterproject.config.JwtService;
@@ -11,6 +12,7 @@ import org.example.twitterproject.repositories.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -20,13 +22,17 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
     @Autowired
-    private UserRepo userRepo;
+    private final UserRepo userRepo;
 
     @Autowired
-    private JwtService jwtService;
+    private final JwtService jwtService;
+
+    @Autowired
+    private final PasswordEncoder passwordEncoder;
 
     public List<DisplayUserDTO> getUsers() {
         List<User> users = userRepo.findAll();
@@ -74,7 +80,8 @@ public class UserService {
         user.setLastName(updateUser.getLastName());
         user.setUserName(updateUser.getUserName());
         user.setEmail(updateUser.getEmail());
-        user.setPassword(updateUser.getPassword());
+        user.setPassword(passwordEncoder.encode(updateUser.getPassword()));
+
 
         userRepo.save(user);
     }
