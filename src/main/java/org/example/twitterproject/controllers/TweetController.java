@@ -4,6 +4,7 @@ import org.example.twitterproject.models.Tweet;
 import org.example.twitterproject.models.TweetDTO;
 import org.example.twitterproject.services.TweetService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,8 +21,10 @@ public class TweetController {
     private TweetService tweetService;
 
     @GetMapping("/tweets")
-    public List<Tweet> getTweets(){
-        return tweetService.getTweets();
+    public Page<Tweet> getTweets(@RequestParam(defaultValue = "0") int page,
+                                 @RequestParam(defaultValue = "10") int size){
+
+        return tweetService.getTweets(page, size);
     }
 
     @GetMapping("/tweet/{id}")
@@ -31,10 +34,12 @@ public class TweetController {
         return ResponseEntity.status(HttpStatus.OK).body(tweet);
 
     }
+
     @GetMapping("user/{id}/tweets")
-    public List<Tweet> getTweetsByUser(@PathVariable int id){
-        List<Tweet> tweets = tweetService.getTweetsByUser(id);
-        return tweets;
+    public Page<Tweet> getTweetsByUser(@PathVariable int id,
+                                       @RequestParam(defaultValue = "0") int page,
+                                       @RequestParam(defaultValue = "10") int size){
+        return tweetService.getTweetsByUser(id, page, size);
     }
 
     @PostMapping("/tweets/add")

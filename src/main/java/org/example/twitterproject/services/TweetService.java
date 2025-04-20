@@ -8,7 +8,12 @@ import org.example.twitterproject.models.TweetDTO;
 import org.example.twitterproject.models.User;
 import org.example.twitterproject.repositories.TweetRepo;
 import org.example.twitterproject.repositories.UserRepo;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -31,10 +36,9 @@ public class TweetService {
     @Autowired
     private JwtService jwtService;
 
-    public List<Tweet> getTweets(){
-        List<Tweet> tweets = tweetRepo.findAll();
-        Collections.sort(tweets);
-        return tweets;
+    public Page<Tweet> getTweets(int page, int size){
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        return tweetRepo.findAll(pageable);
     }
 
     public Tweet getTweet(int id) {
@@ -43,12 +47,12 @@ public class TweetService {
         return tweet;
     }
 
-    public List<Tweet> getTweetsByUser(int id) {
-        User user = userRepo.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("User with id : "+id+" is not found"));
-        List<Tweet> tweets = user.getTweets();
-        Collections.sort(tweets);
-        return tweets;
+    public Page<Tweet> getTweetsByUser(int id, int page, int size) {
+        if (!userRepo.existsById(id)){
+            throw new EntityNotFoundException("User with id : "+id+" is not found");
+        }
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        return tweetRepo.findByWriterId(id, pageable);
     }
 
     public void addTweet(TweetDTO tweetD, String token) {
